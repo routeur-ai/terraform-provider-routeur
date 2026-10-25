@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Error",
+  "description": "The error envelope every non-2xx response carries. Branch on `code`, show `message`. Codes are stable and only ever added: unauthenticated (401), forbidden (403), not_found (404), method_not_allowed (405), validation_failed (422), immutable_field (422: a read-only or create-only field sent with a value other than the current one; `errors` names the fields), change_refused (422) and its specific forms — default_project_protected, project_not_empty, project_not_in_workspace, workspace_has_no_projects, key_revoked, key_not_revoked, default_route_protected — rate_limited (429), server_error (500). Treat an unknown code by its HTTP status.",
+  "type": "object",
+  "required": [
+    "message",
+    "code"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "message": {
+      "type": "string",
+      "description": "Human-readable; may change wording."
+    },
+    "code": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$",
+      "description": "Stable machine code."
+    },
+    "errors": {
+      "type": "object",
+      "description": "validation_failed and immutable_field: messages per request field (dotted path for nested fields).",
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "minItems": 1
+      }
+    }
+  }
+}

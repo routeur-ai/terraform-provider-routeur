@@ -1,0 +1,88 @@
+{
+  "Unauthenticated": {
+    "description": "unauthenticated — missing, malformed, unknown, revoked or expired token.",
+    "headers": {
+      "WWW-Authenticate": {
+        "schema": {
+          "type": "string",
+          "const": "Bearer"
+        }
+      }
+    },
+    "content": {
+      "application/json": {
+        "schema": {
+          "$ref": "schemas/Error.json"
+        }
+      }
+    }
+  },
+  "Forbidden": {
+    "description": "forbidden — the token’s user lacks the permission or a platform seat; org_mismatch when the {organisation} slug is not the token’s organisation (the same answer whether that slug exists or not, so it never means the resource is gone); mfa_required when the organisation requires MFA and the token’s owner has not enrolled (enrol in routeur.ai and the token works again); feature_unavailable when the plan lacks a feature.",
+    "content": {
+      "application/json": {
+        "schema": {
+          "anyOf": [
+            {
+              "$ref": "schemas/Error.json"
+            },
+            {
+              "$ref": "schemas/FeatureUnavailableError.json"
+            }
+          ]
+        }
+      }
+    }
+  },
+  "NotFound": {
+    "description": "not_found — unknown workspace or id in the token’s organisation (including an ill-formed public id). An organisation slug that is not the token’s is a 403 org_mismatch, never a 404.",
+    "content": {
+      "application/json": {
+        "schema": {
+          "$ref": "schemas/Error.json"
+        }
+      }
+    }
+  },
+  "ValidationFailed": {
+    "description": "validation_failed, with `errors` per field.",
+    "content": {
+      "application/json": {
+        "schema": {
+          "$ref": "schemas/Error.json"
+        }
+      }
+    }
+  },
+  "RateLimited": {
+    "description": "rate_limited — per token, 600 reads (GET) and 120 writes per minute, counted separately; plus 1200 requests/minute per IP before authentication. Wait for Retry-After seconds.",
+    "headers": {
+      "Retry-After": {
+        "schema": {
+          "type": "integer"
+        },
+        "description": "Seconds until a retry can succeed."
+      }
+    },
+    "content": {
+      "application/json": {
+        "schema": {
+          "$ref": "schemas/Error.json"
+        }
+      }
+    }
+  },
+  "ServerError": {
+    "description": "server_error — nothing about the cause is exposed; retry later.",
+    "content": {
+      "application/json": {
+        "schema": {
+          "$ref": "schemas/Error.json"
+        }
+      }
+    }
+  },
+  "NoContent": {
+    "description": "Deleted. No body."
+  }
+}

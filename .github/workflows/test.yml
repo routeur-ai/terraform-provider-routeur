@@ -1,0 +1,96 @@
+# Build, lint, generated-docs drift and unit tests. The unit tests drive the
+# Terraform CLI against test API servers, so they run across several Terraform
+# versions. Acceptance tests (`make testacc`) are not run here.
+name: Tests
+
+on:
+  pull_request:
+    paths-ignore:
+      - 'README.md'
+      - 'CHANGELOG.md'
+  push:
+    paths-ignore:
+      - 'README.md'
+      - 'CHANGELOG.md'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build and lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: 'go.mod'
+          cache: true
+      - run: go mod download
+      - run: go build -v .
+      - run: go vet ./...
+      - name: Run linters
+        uses: golangci/golangci-lint-action@ba0d7d2ec06a0ea1cb5fa41b2e4a3ab91d21278a # v9.3.0
+        with:
+          version: v2.15.0
+
+  generate:
+    name: Generated docs are up to date
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: 'go.mod'
+          cache: true
+      # tfplugindocs uses the Terraform CLI to read the provider schema.
+      - uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4.0.1
+        with:
+          terraform_wrapper: false
+      - run: make docs
+      - name: git diff
+        run: |
+          git diff --compact-summary --exit-code || \
+            (echo; echo "docs/ is out of date. Run 'make docs' and commit the result."; exit 1)
+          test -z "$(git status --porcelain docs)" || \
+            (echo; echo "make docs created untracked files:"; git status --porcelain docs; exit 1)
+
+  test:
+    name: Unit tests (Terraform ${{ matrix.terraform }})
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        terraform:
+          - '1.0.*'
+          - '1.5.*'
+          - '1.11.*'
+          - '1.16.*'
+          - '1.17.*'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: 'go.mod'
+          cache: true
+      - uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4.0.1
+        with:
+          terraform_version: ${{ matrix.terraform }}
+          terraform_wrapper: false
+      - run: go mod download
+      - run: go test -v -cover ./...
+        timeout-minutes: 10

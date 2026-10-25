@@ -1,0 +1,293 @@
+{
+  "collection": {
+    "parameters": [
+      {
+        "$ref": "../components/parameters.json#/Organisation"
+      },
+      {
+        "$ref": "../components/parameters.json#/Workspace"
+      }
+    ],
+    "get": {
+      "operationId": "listPromptShieldRules",
+      "tags": [
+        "Prompt shields"
+      ],
+      "summary": "List prompt-shield rules",
+      "description": "Permission: `shields.view`.",
+      "parameters": [
+        {
+          "$ref": "../components/parameters.json#/Limit"
+        },
+        {
+          "$ref": "../components/parameters.json#/Cursor"
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "A page of rules, by id.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "data",
+                  "links",
+                  "meta"
+                ],
+                "properties": {
+                  "data": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "../components/schemas/PromptShieldRule.json"
+                    }
+                  },
+                  "links": {
+                    "$ref": "../components/schemas/PaginationLinks.json"
+                  },
+                  "meta": {
+                    "$ref": "../components/schemas/PaginationMeta.json"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "401": {
+          "$ref": "../components/responses.json#/Unauthenticated"
+        },
+        "403": {
+          "$ref": "../components/responses.json#/Forbidden"
+        },
+        "404": {
+          "$ref": "../components/responses.json#/NotFound"
+        },
+        "422": {
+          "description": "validation_failed — limit or cursor out of range.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../components/schemas/Error.json"
+              }
+            }
+          }
+        },
+        "429": {
+          "$ref": "../components/responses.json#/RateLimited"
+        },
+        "500": {
+          "$ref": "../components/responses.json#/ServerError"
+        }
+      }
+    },
+    "post": {
+      "operationId": "createPromptShieldRule",
+      "tags": [
+        "Prompt shields"
+      ],
+      "summary": "Create a rule",
+      "description": "Permission: `shields.create`.",
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../components/schemas/PromptShieldRuleInput.json"
+            }
+          }
+        }
+      },
+      "responses": {
+        "201": {
+          "description": "Created.",
+          "headers": {
+            "Location": {
+              "description": "URL of the created resource.",
+              "schema": {
+                "type": "string",
+                "format": "uri"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "$ref": "../components/schemas/PromptShieldRule.json"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "401": {
+          "$ref": "../components/responses.json#/Unauthenticated"
+        },
+        "403": {
+          "$ref": "../components/responses.json#/Forbidden"
+        },
+        "404": {
+          "$ref": "../components/responses.json#/NotFound"
+        },
+        "422": {
+          "$ref": "../components/responses.json#/ValidationFailed"
+        },
+        "429": {
+          "$ref": "../components/responses.json#/RateLimited"
+        },
+        "500": {
+          "$ref": "../components/responses.json#/ServerError"
+        }
+      }
+    }
+  },
+  "item": {
+    "parameters": [
+      {
+        "$ref": "../components/parameters.json#/Organisation"
+      },
+      {
+        "$ref": "../components/parameters.json#/Workspace"
+      },
+      {
+        "$ref": "../components/parameters.json#/ShieldRuleId"
+      }
+    ],
+    "get": {
+      "operationId": "getPromptShieldRule",
+      "tags": [
+        "Prompt shields"
+      ],
+      "summary": "Get a rule",
+      "description": "Permission: `shields.view`.",
+      "responses": {
+        "200": {
+          "description": "The rule.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "$ref": "../components/schemas/PromptShieldRule.json"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "401": {
+          "$ref": "../components/responses.json#/Unauthenticated"
+        },
+        "403": {
+          "$ref": "../components/responses.json#/Forbidden"
+        },
+        "404": {
+          "$ref": "../components/responses.json#/NotFound"
+        },
+        "429": {
+          "$ref": "../components/responses.json#/RateLimited"
+        },
+        "500": {
+          "$ref": "../components/responses.json#/ServerError"
+        }
+      }
+    },
+    "put": {
+      "operationId": "replacePromptShieldRule",
+      "tags": [
+        "Prompt shields"
+      ],
+      "summary": "Replace a rule",
+      "description": "Permission: `shields.update`. Full replacement: an omitted `project_id` is cleared; omitted `enabled` is unchanged. Sending a GET body back is a no-op (no audit entry, no config change).",
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../components/schemas/PromptShieldRuleInput.json"
+            }
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "The rule as stored.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "$ref": "../components/schemas/PromptShieldRule.json"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "401": {
+          "$ref": "../components/responses.json#/Unauthenticated"
+        },
+        "403": {
+          "$ref": "../components/responses.json#/Forbidden"
+        },
+        "404": {
+          "$ref": "../components/responses.json#/NotFound"
+        },
+        "422": {
+          "$ref": "../components/responses.json#/ValidationFailed"
+        },
+        "429": {
+          "$ref": "../components/responses.json#/RateLimited"
+        },
+        "500": {
+          "$ref": "../components/responses.json#/ServerError"
+        }
+      }
+    },
+    "delete": {
+      "operationId": "deletePromptShieldRule",
+      "tags": [
+        "Prompt shields"
+      ],
+      "summary": "Delete a rule",
+      "description": "Permission: `shields.delete`.",
+      "responses": {
+        "204": {
+          "$ref": "../components/responses.json#/NoContent"
+        },
+        "401": {
+          "$ref": "../components/responses.json#/Unauthenticated"
+        },
+        "403": {
+          "$ref": "../components/responses.json#/Forbidden"
+        },
+        "404": {
+          "$ref": "../components/responses.json#/NotFound"
+        },
+        "429": {
+          "$ref": "../components/responses.json#/RateLimited"
+        },
+        "500": {
+          "$ref": "../components/responses.json#/ServerError"
+        }
+      }
+    }
+  }
+}

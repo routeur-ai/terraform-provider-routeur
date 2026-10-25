@@ -1,0 +1,293 @@
+{
+  "collection": {
+    "parameters": [
+      {
+        "$ref": "../components/parameters.json#/Organisation"
+      },
+      {
+        "$ref": "../components/parameters.json#/Workspace"
+      }
+    ],
+    "get": {
+      "operationId": "listDlpPolicies",
+      "tags": [
+        "DLP policies"
+      ],
+      "summary": "List DLP policies",
+      "description": "Permission: `dlp.view`.",
+      "parameters": [
+        {
+          "$ref": "../components/parameters.json#/Limit"
+        },
+        {
+          "$ref": "../components/parameters.json#/Cursor"
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "A page of policies, oldest first (by id).",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "data",
+                  "links",
+                  "meta"
+                ],
+                "properties": {
+                  "data": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "../components/schemas/DlpPolicy.json"
+                    }
+                  },
+                  "links": {
+                    "$ref": "../components/schemas/PaginationLinks.json"
+                  },
+                  "meta": {
+                    "$ref": "../components/schemas/PaginationMeta.json"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "401": {
+          "$ref": "../components/responses.json#/Unauthenticated"
+        },
+        "403": {
+          "$ref": "../components/responses.json#/Forbidden"
+        },
+        "404": {
+          "$ref": "../components/responses.json#/NotFound"
+        },
+        "422": {
+          "description": "validation_failed — limit or cursor out of range.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../components/schemas/Error.json"
+              }
+            }
+          }
+        },
+        "429": {
+          "$ref": "../components/responses.json#/RateLimited"
+        },
+        "500": {
+          "$ref": "../components/responses.json#/ServerError"
+        }
+      }
+    },
+    "post": {
+      "operationId": "createDlpPolicy",
+      "tags": [
+        "DLP policies"
+      ],
+      "summary": "Create a DLP policy",
+      "description": "Permission: `dlp.create`. Validation matches app.routeur.ai: managed detector ids, RE2-safe regex, action and severity enums; `action: tokenize` additionally needs the plan that includes it (422 on `action`). Errors are keyed to the body field — `presets`, `keywords`, `secrets` or `pattern`.",
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../components/schemas/DlpPolicyInput.json"
+            }
+          }
+        }
+      },
+      "responses": {
+        "201": {
+          "description": "Created.",
+          "headers": {
+            "Location": {
+              "description": "URL of the created resource.",
+              "schema": {
+                "type": "string",
+                "format": "uri"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "$ref": "../components/schemas/DlpPolicy.json"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "401": {
+          "$ref": "../components/responses.json#/Unauthenticated"
+        },
+        "403": {
+          "$ref": "../components/responses.json#/Forbidden"
+        },
+        "404": {
+          "$ref": "../components/responses.json#/NotFound"
+        },
+        "422": {
+          "$ref": "../components/responses.json#/ValidationFailed"
+        },
+        "429": {
+          "$ref": "../components/responses.json#/RateLimited"
+        },
+        "500": {
+          "$ref": "../components/responses.json#/ServerError"
+        }
+      }
+    }
+  },
+  "item": {
+    "parameters": [
+      {
+        "$ref": "../components/parameters.json#/Organisation"
+      },
+      {
+        "$ref": "../components/parameters.json#/Workspace"
+      },
+      {
+        "$ref": "../components/parameters.json#/PolicyId"
+      }
+    ],
+    "get": {
+      "operationId": "getDlpPolicy",
+      "tags": [
+        "DLP policies"
+      ],
+      "summary": "Get a DLP policy",
+      "description": "Permission: `dlp.view`.",
+      "responses": {
+        "200": {
+          "description": "The policy.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "$ref": "../components/schemas/DlpPolicy.json"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "401": {
+          "$ref": "../components/responses.json#/Unauthenticated"
+        },
+        "403": {
+          "$ref": "../components/responses.json#/Forbidden"
+        },
+        "404": {
+          "$ref": "../components/responses.json#/NotFound"
+        },
+        "429": {
+          "$ref": "../components/responses.json#/RateLimited"
+        },
+        "500": {
+          "$ref": "../components/responses.json#/ServerError"
+        }
+      }
+    },
+    "put": {
+      "operationId": "replaceDlpPolicy",
+      "tags": [
+        "DLP policies"
+      ],
+      "summary": "Replace a DLP policy",
+      "description": "Permission: `dlp.update`. Replaces the whole policy (same body as create); `enabled` and `project_id` included, so this also enables or disables it. Sending back a GET body changes nothing.",
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../components/schemas/DlpPolicyInput.json"
+            }
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "The policy as stored.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "$ref": "../components/schemas/DlpPolicy.json"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "401": {
+          "$ref": "../components/responses.json#/Unauthenticated"
+        },
+        "403": {
+          "$ref": "../components/responses.json#/Forbidden"
+        },
+        "404": {
+          "$ref": "../components/responses.json#/NotFound"
+        },
+        "422": {
+          "$ref": "../components/responses.json#/ValidationFailed"
+        },
+        "429": {
+          "$ref": "../components/responses.json#/RateLimited"
+        },
+        "500": {
+          "$ref": "../components/responses.json#/ServerError"
+        }
+      }
+    },
+    "delete": {
+      "operationId": "deleteDlpPolicy",
+      "tags": [
+        "DLP policies"
+      ],
+      "summary": "Delete a DLP policy",
+      "description": "Permission: `dlp.delete`.",
+      "responses": {
+        "204": {
+          "$ref": "../components/responses.json#/NoContent"
+        },
+        "401": {
+          "$ref": "../components/responses.json#/Unauthenticated"
+        },
+        "403": {
+          "$ref": "../components/responses.json#/Forbidden"
+        },
+        "404": {
+          "$ref": "../components/responses.json#/NotFound"
+        },
+        "429": {
+          "$ref": "../components/responses.json#/RateLimited"
+        },
+        "500": {
+          "$ref": "../components/responses.json#/ServerError"
+        }
+      }
+    }
+  }
+}

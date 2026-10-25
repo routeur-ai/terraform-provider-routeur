@@ -1,0 +1,108 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "PromptShieldRuleInput",
+  "description": "Body of POST /prompt-shield-rules and PUT /prompt-shield-rules/{ruleId}. PUT replaces the rule (send the payload key that belongs to detector: `keywords` or `pattern`): an omitted `project_id` is cleared; an omitted `enabled` is left unchanged (true on create). Unknown keys are a 422.",
+  "type": "object",
+  "required": [
+    "name",
+    "slug",
+    "category",
+    "detector",
+    "action",
+    "severity"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 80,
+      "description": "Unique among this workspace's rules."
+    },
+    "slug": {
+      "type": "string",
+      "maxLength": 64,
+      "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$",
+      "description": "Unique among this workspace's rules. The rule's identity in traces; changing it renames the rule there."
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "instruction_override",
+        "role_play",
+        "system_leak",
+        "indirect_injection",
+        "tool_abuse"
+      ]
+    },
+    "detector": {
+      "type": "string",
+      "enum": [
+        "keyword",
+        "regex"
+      ]
+    },
+    "pattern": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2000,
+      "description": "RE2 regular expression (lookarounds and backreferences are rejected). Required when detector is `regex`; a 422 for detector `keyword`."
+    },
+    "keywords": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "pattern": "^[^,]+$"
+      },
+      "minItems": 1,
+      "uniqueItems": true,
+      "description": "Case-insensitive substrings; no commas, no leading or trailing whitespace. Required when detector is `keyword`; a 422 for detector `regex`."
+    },
+    "action": {
+      "type": "string",
+      "enum": [
+        "log",
+        "warn",
+        "sanitize",
+        "block"
+      ]
+    },
+    "severity": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ]
+    },
+    "project_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^proj_[1-9][0-9]*$",
+      "description": "A project of this workspace (proj_12) to scope the rule to it; null or omitted = every project in the workspace. A project from another workspace is a 422."
+    },
+    "enabled": {
+      "type": "boolean",
+      "description": "Absent = true on create, unchanged on update or replace. Boolean only: null is a 422."
+    },
+    "id": {
+      "readOnly": true,
+      "description": "Response field (read-only). Absent or null on create; on update it may be echoed back only with its current value — anything else is a 422 immutable_field."
+    },
+    "workspace_id": {
+      "readOnly": true,
+      "description": "Response field (read-only). Absent or null on create; on update it may be echoed back only with its current value — anything else is a 422 immutable_field."
+    },
+    "created_at": {
+      "readOnly": true,
+      "description": "Response field (read-only). Absent or null on create; on update it may be echoed back only with its current value — anything else is a 422 immutable_field."
+    },
+    "updated_at": {
+      "readOnly": true,
+      "description": "Response field (read-only). Absent or null on create; on update it may be echoed back only with its current value — anything else is a 422 immutable_field."
+    }
+  }
+}

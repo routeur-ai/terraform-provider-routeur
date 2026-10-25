@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DefaultRouteInput",
+  "description": "Body of PUT /default-route. Only action.quality_bias is writable (absent = 50); every other routing-rule field is fixed on the Default route and may be echoed back only with its current value (else 422 immutable_field), so the GET body can be PUT back. Unknown keys are a 422.",
+  "type": "object",
+  "required": [],
+  "additionalProperties": false,
+  "properties": {
+    "action": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "quality_bias": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        }
+      }
+    },
+    "project_id": {
+      "readOnly": true,
+      "description": "Fixed on the Default route: absent, null or the current value — anything else is a 422 immutable_field."
+    },
+    "name": {
+      "readOnly": true,
+      "description": "Fixed on the Default route: absent, null or the current value — anything else is a 422 immutable_field."
+    },
+    "priority": {
+      "readOnly": true,
+      "description": "Fixed on the Default route: absent, null or the current value — anything else is a 422 immutable_field."
+    },
+    "enabled": {
+      "readOnly": true,
+      "description": "Fixed on the Default route: absent, null or the current value — anything else is a 422 immutable_field."
+    },
+    "action_kind": {
+      "readOnly": true,
+      "description": "Fixed on the Default route: absent, null or the current value — anything else is a 422 immutable_field."
+    },
+    "match": {
+      "readOnly": true,
+      "description": "Fixed on the Default route: absent, null or the current value — anything else is a 422 immutable_field."
+    },
+    "on_failure": {
+      "readOnly": true,
+      "description": "Fixed on the Default route: absent, null or the current value — anything else is a 422 immutable_field."
+    },
+    "id": {
+      "readOnly": true,
+      "description": "Response field (read-only). Absent or null on create; on update it may be echoed back only with its current value — anything else is a 422 immutable_field."
+    },
+    "workspace_id": {
+      "readOnly": true,
+      "description": "Response field (read-only). Absent or null on create; on update it may be echoed back only with its current value — anything else is a 422 immutable_field."
+    },
+    "slug": {
+      "readOnly": true,
+      "description": "Response field (read-only). Absent or null on create; on update it may be echoed back only with its current value — anything else is a 422 immutable_field."
+    },
+    "is_default": {
+      "readOnly": true,
+      "description": "Response field (read-only). Absent or null on create; on update it may be echoed back only with its current value — anything else is a 422 immutable_field."
+    },
+    "created_at": {
+      "readOnly": true,
+      "description": "Response field (read-only). Absent or null on create; on update it may be echoed back only with its current value — anything else is a 422 immutable_field."
+    },
+    "updated_at": {
+      "readOnly": true,
+      "description": "Response field (read-only). Absent or null on create; on update it may be echoed back only with its current value — anything else is a 422 immutable_field."
+    }
+  }
+}

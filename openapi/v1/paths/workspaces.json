@@ -1,0 +1,297 @@
+{
+  "collection": {
+    "parameters": [
+      {
+        "$ref": "../components/parameters.json#/Organisation"
+      }
+    ],
+    "get": {
+      "operationId": "listWorkspaces",
+      "tags": [
+        "Workspaces"
+      ],
+      "summary": "List workspaces",
+      "description": "Permission: `workspaces.viewer`.",
+      "parameters": [
+        {
+          "$ref": "../components/parameters.json#/Limit"
+        },
+        {
+          "$ref": "../components/parameters.json#/Cursor"
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "A page of workspaces, oldest first.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "data",
+                  "links",
+                  "meta"
+                ],
+                "properties": {
+                  "data": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "../components/schemas/Workspace.json"
+                    }
+                  },
+                  "links": {
+                    "$ref": "../components/schemas/PaginationLinks.json"
+                  },
+                  "meta": {
+                    "$ref": "../components/schemas/PaginationMeta.json"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "401": {
+          "$ref": "../components/responses.json#/Unauthenticated"
+        },
+        "403": {
+          "$ref": "../components/responses.json#/Forbidden"
+        },
+        "404": {
+          "$ref": "../components/responses.json#/NotFound"
+        },
+        "422": {
+          "description": "validation_failed — limit or cursor out of range.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../components/schemas/Error.json"
+              }
+            }
+          }
+        },
+        "429": {
+          "$ref": "../components/responses.json#/RateLimited"
+        },
+        "500": {
+          "$ref": "../components/responses.json#/ServerError"
+        }
+      }
+    },
+    "post": {
+      "operationId": "createWorkspace",
+      "tags": [
+        "Workspaces"
+      ],
+      "summary": "Create a workspace",
+      "description": "Permission: `workspaces.admin`. Also creates the workspace's default project (slug `<workspace slug>-core`) and its Default route, as creating a workspace in app.routeur.ai does. The `slug` is set here and cannot be changed afterwards.",
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../components/schemas/WorkspaceCreate.json"
+            }
+          }
+        }
+      },
+      "responses": {
+        "201": {
+          "description": "Created.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "$ref": "../components/schemas/Workspace.json"
+                  }
+                }
+              }
+            }
+          },
+          "headers": {
+            "Location": {
+              "description": "URL of the created resource.",
+              "schema": {
+                "type": "string",
+                "format": "uri"
+              }
+            }
+          }
+        },
+        "401": {
+          "$ref": "../components/responses.json#/Unauthenticated"
+        },
+        "403": {
+          "$ref": "../components/responses.json#/Forbidden"
+        },
+        "404": {
+          "$ref": "../components/responses.json#/NotFound"
+        },
+        "422": {
+          "$ref": "../components/responses.json#/ValidationFailed"
+        },
+        "429": {
+          "$ref": "../components/responses.json#/RateLimited"
+        },
+        "500": {
+          "$ref": "../components/responses.json#/ServerError"
+        }
+      }
+    }
+  },
+  "item": {
+    "parameters": [
+      {
+        "$ref": "../components/parameters.json#/Organisation"
+      },
+      {
+        "$ref": "../components/parameters.json#/Workspace"
+      }
+    ],
+    "get": {
+      "operationId": "getWorkspace",
+      "tags": [
+        "Workspaces"
+      ],
+      "summary": "Get a workspace",
+      "description": "Permission: `workspaces.viewer`.",
+      "responses": {
+        "200": {
+          "description": "The workspace.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "$ref": "../components/schemas/Workspace.json"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "401": {
+          "$ref": "../components/responses.json#/Unauthenticated"
+        },
+        "403": {
+          "$ref": "../components/responses.json#/Forbidden"
+        },
+        "404": {
+          "$ref": "../components/responses.json#/NotFound"
+        },
+        "429": {
+          "$ref": "../components/responses.json#/RateLimited"
+        },
+        "500": {
+          "$ref": "../components/responses.json#/ServerError"
+        }
+      }
+    },
+    "patch": {
+      "operationId": "updateWorkspace",
+      "tags": [
+        "Workspaces"
+      ],
+      "summary": "Update a workspace",
+      "description": "Permission: `workspaces.admin`. Name and description only; the slug is create-only (echoed back it must be unchanged, else 422 immutable_field). A body that changes nothing returns the workspace unchanged without an audit entry.",
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../components/schemas/WorkspaceUpdate.json"
+            }
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "The updated workspace.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "$ref": "../components/schemas/Workspace.json"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "401": {
+          "$ref": "../components/responses.json#/Unauthenticated"
+        },
+        "403": {
+          "$ref": "../components/responses.json#/Forbidden"
+        },
+        "404": {
+          "$ref": "../components/responses.json#/NotFound"
+        },
+        "422": {
+          "$ref": "../components/responses.json#/ValidationFailed"
+        },
+        "429": {
+          "$ref": "../components/responses.json#/RateLimited"
+        },
+        "500": {
+          "$ref": "../components/responses.json#/ServerError"
+        }
+      }
+    },
+    "delete": {
+      "operationId": "deleteWorkspace",
+      "tags": [
+        "Workspaces"
+      ],
+      "summary": "Delete a workspace",
+      "description": "Permission: `workspaces.admin`. Refused for the default workspace and for the organisation's last workspace. A workspace that holds only what was created with it — the default project (with no API keys) and the Default route — is deleted together with them. Any other project, API key, routing rule, output moderation rule or classifier rule must be deleted first.",
+      "responses": {
+        "204": {
+          "$ref": "../components/responses.json#/NoContent"
+        },
+        "401": {
+          "$ref": "../components/responses.json#/Unauthenticated"
+        },
+        "403": {
+          "$ref": "../components/responses.json#/Forbidden"
+        },
+        "404": {
+          "$ref": "../components/responses.json#/NotFound"
+        },
+        "422": {
+          "description": "default_workspace_protected for the organisation's default workspace; last_workspace_protected for the organisation's only remaining workspace (an organisation must keep at least one); workspace_not_empty while it still holds projects, API keys, routing rules, DLP policies, output moderation rules, prompt-shield rules, classifier rules, anomaly detectors or budgets of its own.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../components/schemas/Error.json"
+              }
+            }
+          }
+        },
+        "429": {
+          "$ref": "../components/responses.json#/RateLimited"
+        },
+        "500": {
+          "$ref": "../components/responses.json#/ServerError"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "WorkspaceCreate",
+  "description": "Body of POST /workspaces. Unknown keys are a 422.",
+  "type": "object",
+  "required": [
+    "name",
+    "slug"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 80
+    },
+    "slug": {
+      "type": "string",
+      "maxLength": 55,
+      "pattern": "^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$",
+      "description": "Unique in the organisation; at most 55 characters (its default project is created as `<slug>-core`); set at create only — it is the workspace's URL identity and cannot be changed (changing it means replacing the workspace). Create-only: on update it may be echoed back only with its current value — anything else is a 422 immutable_field. Changing it means replacing the resource.",
+      "x-create-only": true
+    },
+    "description": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "maxLength": 255
+    },
+    "id": {
+      "readOnly": true,
+      "description": "Response field (read-only). Absent or null on create; on update it may be echoed back only with its current value — anything else is a 422 immutable_field."
+    },
+    "is_default": {
+      "readOnly": true,
+      "description": "Response field (read-only). Absent or null on create; on update it may be echoed back only with its current value — anything else is a 422 immutable_field."
+    },
+    "created_at": {
+      "readOnly": true,
+      "description": "Response field (read-only). Absent or null on create; on update it may be echoed back only with its current value — anything else is a 422 immutable_field."
+    },
+    "updated_at": {
+      "readOnly": true,
+      "description": "Response field (read-only). Absent or null on create; on update it may be echoed back only with its current value — anything else is a 422 immutable_field."
+    },
+    "default_project_id": {
+      "readOnly": true,
+      "description": "Response field (read-only). Absent or null on create; on update it may be echoed back only with its current value — anything else is a 422 immutable_field."
+    }
+  }
+}

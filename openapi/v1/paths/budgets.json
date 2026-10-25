@@ -1,0 +1,287 @@
+{
+  "collection": {
+    "parameters": [
+      {
+        "$ref": "../components/parameters.json#/Organisation"
+      }
+    ],
+    "get": {
+      "operationId": "listBudgets",
+      "tags": [
+        "Budgets"
+      ],
+      "summary": "List budgets",
+      "description": "Permission: `budgets.admin` (there is no separate view permission). Not plan-gated (plan feature `budgets` gates create and update only), so reads and deletes keep working after a downgrade.",
+      "parameters": [
+        {
+          "$ref": "../components/parameters.json#/Limit"
+        },
+        {
+          "$ref": "../components/parameters.json#/Cursor"
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "A page of budgets, oldest first.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "data",
+                  "links",
+                  "meta"
+                ],
+                "properties": {
+                  "data": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "../components/schemas/Budget.json"
+                    }
+                  },
+                  "links": {
+                    "$ref": "../components/schemas/PaginationLinks.json"
+                  },
+                  "meta": {
+                    "$ref": "../components/schemas/PaginationMeta.json"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "401": {
+          "$ref": "../components/responses.json#/Unauthenticated"
+        },
+        "403": {
+          "$ref": "../components/responses.json#/Forbidden"
+        },
+        "404": {
+          "$ref": "../components/responses.json#/NotFound"
+        },
+        "422": {
+          "description": "validation_failed — limit or cursor out of range.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../components/schemas/Error.json"
+              }
+            }
+          }
+        },
+        "429": {
+          "$ref": "../components/responses.json#/RateLimited"
+        },
+        "500": {
+          "$ref": "../components/responses.json#/ServerError"
+        }
+      }
+    },
+    "post": {
+      "operationId": "createBudget",
+      "tags": [
+        "Budgets"
+      ],
+      "summary": "Create a budget",
+      "description": "Permission: `budgets.admin` (there is no separate view permission). Plan feature `budgets`: 403 `feature_unavailable` without it. A `scope_id` outside this organisation is a 422 on `scope_id`.",
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../components/schemas/BudgetCreate.json"
+            }
+          }
+        }
+      },
+      "responses": {
+        "201": {
+          "description": "Created.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "$ref": "../components/schemas/Budget.json"
+                  }
+                }
+              }
+            }
+          },
+          "headers": {
+            "Location": {
+              "description": "URL of the created resource.",
+              "schema": {
+                "type": "string",
+                "format": "uri"
+              }
+            }
+          }
+        },
+        "401": {
+          "$ref": "../components/responses.json#/Unauthenticated"
+        },
+        "403": {
+          "$ref": "../components/responses.json#/Forbidden"
+        },
+        "404": {
+          "$ref": "../components/responses.json#/NotFound"
+        },
+        "422": {
+          "$ref": "../components/responses.json#/ValidationFailed"
+        },
+        "429": {
+          "$ref": "../components/responses.json#/RateLimited"
+        },
+        "500": {
+          "$ref": "../components/responses.json#/ServerError"
+        }
+      }
+    }
+  },
+  "item": {
+    "parameters": [
+      {
+        "$ref": "../components/parameters.json#/Organisation"
+      },
+      {
+        "$ref": "../components/parameters.json#/BudgetId"
+      }
+    ],
+    "get": {
+      "operationId": "getBudget",
+      "tags": [
+        "Budgets"
+      ],
+      "summary": "Get a budget",
+      "description": "Permission: `budgets.admin` (there is no separate view permission). Not plan-gated (plan feature `budgets` gates create and update only), so reads and deletes keep working after a downgrade.",
+      "responses": {
+        "200": {
+          "description": "The budget.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "$ref": "../components/schemas/Budget.json"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "401": {
+          "$ref": "../components/responses.json#/Unauthenticated"
+        },
+        "403": {
+          "$ref": "../components/responses.json#/Forbidden"
+        },
+        "404": {
+          "$ref": "../components/responses.json#/NotFound"
+        },
+        "429": {
+          "$ref": "../components/responses.json#/RateLimited"
+        },
+        "500": {
+          "$ref": "../components/responses.json#/ServerError"
+        }
+      }
+    },
+    "patch": {
+      "operationId": "updateBudget",
+      "tags": [
+        "Budgets"
+      ],
+      "summary": "Update a budget",
+      "description": "Permission: `budgets.admin` (there is no separate view permission). Plan feature `budgets`: 403 `feature_unavailable` without it. A save that changes nothing writes no audit entry.",
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../components/schemas/BudgetUpdate.json"
+            }
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "The updated budget.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "$ref": "../components/schemas/Budget.json"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "401": {
+          "$ref": "../components/responses.json#/Unauthenticated"
+        },
+        "403": {
+          "$ref": "../components/responses.json#/Forbidden"
+        },
+        "404": {
+          "$ref": "../components/responses.json#/NotFound"
+        },
+        "422": {
+          "$ref": "../components/responses.json#/ValidationFailed"
+        },
+        "429": {
+          "$ref": "../components/responses.json#/RateLimited"
+        },
+        "500": {
+          "$ref": "../components/responses.json#/ServerError"
+        }
+      }
+    },
+    "delete": {
+      "operationId": "deleteBudget",
+      "tags": [
+        "Budgets"
+      ],
+      "summary": "Delete a budget",
+      "description": "Permission: `budgets.admin` (there is no separate view permission). Not plan-gated (plan feature `budgets` gates create and update only), so reads and deletes keep working after a downgrade. A hard cap it enforced is lifted on the next budgets evaluation pass.",
+      "responses": {
+        "204": {
+          "$ref": "../components/responses.json#/NoContent"
+        },
+        "401": {
+          "$ref": "../components/responses.json#/Unauthenticated"
+        },
+        "403": {
+          "$ref": "../components/responses.json#/Forbidden"
+        },
+        "404": {
+          "$ref": "../components/responses.json#/NotFound"
+        },
+        "429": {
+          "$ref": "../components/responses.json#/RateLimited"
+        },
+        "500": {
+          "$ref": "../components/responses.json#/ServerError"
+        }
+      }
+    }
+  }
+}

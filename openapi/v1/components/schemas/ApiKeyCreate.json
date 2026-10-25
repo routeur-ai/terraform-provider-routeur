@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ApiKeyCreate",
+  "description": "Body of POST /api-keys. Unknown keys are a 422.",
+  "type": "object",
+  "required": [
+    "name"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 80
+    },
+    "project_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "A proj_… id in this workspace; null or absent = the workspace’s default project."
+    },
+    "id": {
+      "readOnly": true,
+      "description": "Response field (read-only). Absent or null on create; on update it may be echoed back only with its current value — anything else is a 422 immutable_field."
+    },
+    "fingerprint": {
+      "readOnly": true,
+      "description": "Response field (read-only). Absent or null on create; on update it may be echoed back only with its current value — anything else is a 422 immutable_field."
+    },
+    "state": {
+      "readOnly": true,
+      "description": "Response field (read-only). Absent or null on create; on update it may be echoed back only with its current value — anything else is a 422 immutable_field."
+    },
+    "last_used_at": {
+      "readOnly": true,
+      "description": "Response field (read-only). Absent or null on create; on update it may be echoed back only with its current value — anything else is a 422 immutable_field."
+    },
+    "revoked_at": {
+      "readOnly": true,
+      "description": "Response field (read-only). Absent or null on create; on update it may be echoed back only with its current value — anything else is a 422 immutable_field."
+    },
+    "disabled_at": {
+      "readOnly": true,
+      "description": "Response field (read-only). Absent or null on create; on update it may be echoed back only with its current value — anything else is a 422 immutable_field."
+    },
+    "enabled": {
+      "type": "boolean",
+      "description": "Absent or true = the key is created active; false = created disabled (state `disabled`), like PATCH enabled:false right after create. Boolean only: null is a 422."
+    },
+    "updated_at": {
+      "readOnly": true,
+      "description": "Response field (read-only). Absent or null on create; on update it may be echoed back only with its current value — anything else is a 422 immutable_field."
+    },
+    "created_at": {
+      "readOnly": true,
+      "description": "Response field (read-only). Absent or null on create; on update it may be echoed back only with its current value — anything else is a 422 immutable_field."
+    }
+  }
+}

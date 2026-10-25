@@ -1,0 +1,115 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AnomalyDetector",
+  "description": "An anomaly detector as stored. The same body PUT back to /anomaly-detectors/{detectorId} is a no-op. Anomaly events and the evaluator's `last_evaluated_at` are operational state and are not part of this API.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "workspace_id",
+    "name",
+    "type",
+    "threshold",
+    "window_minutes",
+    "action",
+    "enabled",
+    "created_at",
+    "updated_at"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^anom_[1-9][0-9]*$",
+      "description": "Public id of the anomaly detector.",
+      "examples": [
+        "anom_12"
+      ]
+    },
+    "workspace_id": {
+      "type": "string",
+      "pattern": "^ws_[1-9][0-9]*$",
+      "description": "Public id of the workspace.",
+      "examples": [
+        "ws_12"
+      ]
+    },
+    "name": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "volume_spike",
+        "cost_spike",
+        "latency_spike",
+        "error_burst"
+      ]
+    },
+    "threshold": {
+      "type": "object",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "maxProperties": 1,
+      "description": "Exactly one key, chosen by `type`: volume_spike → baseline_pct (integer percent over baseline, 1–10000000); cost_spike → amount_cents (integer US cents, 1–1000000000); latency_spike → p95_ms (integer, 1–10000000); error_burst → error_rate_pct (number percent, 0.01–100).",
+      "properties": {
+        "baseline_pct": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10000000
+        },
+        "amount_cents": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000000000
+        },
+        "p95_ms": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10000000
+        },
+        "error_rate_pct": {
+          "type": "number",
+          "minimum": 0.01,
+          "maximum": 100
+        }
+      }
+    },
+    "window_minutes": {
+      "type": "integer",
+      "enum": [
+        5,
+        15,
+        30,
+        60,
+        180,
+        360,
+        720,
+        1440
+      ],
+      "description": "Evaluation window in minutes."
+    },
+    "action": {
+      "type": "string",
+      "enum": [
+        "alert",
+        "throttle",
+        "quarantine",
+        "block"
+      ],
+      "description": "`alert` records an event; `quarantine` and `block` also refuse matching requests while the event is open (429 anomaly_block_active); `throttle` is stored but not enforced."
+    },
+    "enabled": {
+      "type": "boolean"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO-8601, UTC."
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO-8601, UTC."
+    }
+  }
+}

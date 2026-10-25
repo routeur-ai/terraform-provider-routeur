@@ -1,0 +1,108 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ModerationRuleInput",
+  "description": "Body of POST /moderation-rules and PUT /moderation-rules/{ruleId}. PUT replaces the rule: omitted `pattern`, `streaming` and `project_id` are cleared; omitted `enabled` is left unchanged (true on create). A `pattern` is a 422 unless category is `regex`. Unknown keys are a 422.",
+  "type": "object",
+  "required": [
+    "name",
+    "slug",
+    "category",
+    "action",
+    "severity"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 80,
+      "description": "Unique among this workspace's rules."
+    },
+    "slug": {
+      "type": "string",
+      "maxLength": 64,
+      "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$",
+      "description": "Unique among this workspace's rules. The rule's identity in traces; changing it renames the rule there."
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "hate",
+        "harassment",
+        "profanity",
+        "sexual",
+        "sexual_minors",
+        "self_harm",
+        "violence",
+        "weapons",
+        "regex"
+      ]
+    },
+    "pattern": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "minLength": 1,
+      "maxLength": 2000,
+      "description": "RE2 regex (lookarounds and backreferences are rejected); required when category is `regex`, must be absent or null otherwise."
+    },
+    "action": {
+      "type": "string",
+      "enum": [
+        "log",
+        "redact",
+        "block",
+        "rewrite"
+      ]
+    },
+    "severity": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ]
+    },
+    "streaming": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "buffered",
+        "chunked",
+        null
+      ],
+      "description": "Per-rule override of the organisation streaming default; null or omitted inherits it."
+    },
+    "project_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^proj_[1-9][0-9]*$",
+      "description": "A project of this workspace (proj_12) to scope the rule to it; null or omitted = every project in the workspace. A project from another workspace is a 422."
+    },
+    "enabled": {
+      "type": "boolean",
+      "description": "Absent = true on create, unchanged on update or replace. Boolean only: null is a 422."
+    },
+    "id": {
+      "readOnly": true,
+      "description": "Response field (read-only). Absent or null on create; on update it may be echoed back only with its current value — anything else is a 422 immutable_field."
+    },
+    "workspace_id": {
+      "readOnly": true,
+      "description": "Response field (read-only). Absent or null on create; on update it may be echoed back only with its current value — anything else is a 422 immutable_field."
+    },
+    "created_at": {
+      "readOnly": true,
+      "description": "Response field (read-only). Absent or null on create; on update it may be echoed back only with its current value — anything else is a 422 immutable_field."
+    },
+    "updated_at": {
+      "readOnly": true,
+      "description": "Response field (read-only). Absent or null on create; on update it may be echoed back only with its current value — anything else is a 422 immutable_field."
+    }
+  }
+}

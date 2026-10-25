@@ -1,0 +1,310 @@
+{
+  "collection": {
+    "parameters": [
+      {
+        "$ref": "../components/parameters.json#/Organisation"
+      },
+      {
+        "$ref": "../components/parameters.json#/Workspace"
+      }
+    ],
+    "get": {
+      "operationId": "listProjects",
+      "tags": [
+        "Projects"
+      ],
+      "summary": "List projects",
+      "description": "Permission: `projects.view`.",
+      "parameters": [
+        {
+          "$ref": "../components/parameters.json#/Limit"
+        },
+        {
+          "$ref": "../components/parameters.json#/Cursor"
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "A page of projects, oldest first.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "data",
+                  "links",
+                  "meta"
+                ],
+                "properties": {
+                  "data": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "../components/schemas/Project.json"
+                    }
+                  },
+                  "links": {
+                    "$ref": "../components/schemas/PaginationLinks.json"
+                  },
+                  "meta": {
+                    "$ref": "../components/schemas/PaginationMeta.json"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "401": {
+          "$ref": "../components/responses.json#/Unauthenticated"
+        },
+        "403": {
+          "$ref": "../components/responses.json#/Forbidden"
+        },
+        "404": {
+          "$ref": "../components/responses.json#/NotFound"
+        },
+        "422": {
+          "description": "validation_failed — limit or cursor out of range.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../components/schemas/Error.json"
+              }
+            }
+          }
+        },
+        "429": {
+          "$ref": "../components/responses.json#/RateLimited"
+        },
+        "500": {
+          "$ref": "../components/responses.json#/ServerError"
+        }
+      }
+    },
+    "post": {
+      "operationId": "createProject",
+      "tags": [
+        "Projects"
+      ],
+      "summary": "Create a project",
+      "description": "Permission: `projects.create`.",
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../components/schemas/ProjectCreate.json"
+            }
+          }
+        }
+      },
+      "responses": {
+        "201": {
+          "description": "Created.",
+          "headers": {
+            "Location": {
+              "description": "URL of the created resource.",
+              "schema": {
+                "type": "string",
+                "format": "uri"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "$ref": "../components/schemas/Project.json"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "401": {
+          "$ref": "../components/responses.json#/Unauthenticated"
+        },
+        "403": {
+          "$ref": "../components/responses.json#/Forbidden"
+        },
+        "404": {
+          "$ref": "../components/responses.json#/NotFound"
+        },
+        "422": {
+          "$ref": "../components/responses.json#/ValidationFailed"
+        },
+        "429": {
+          "$ref": "../components/responses.json#/RateLimited"
+        },
+        "500": {
+          "$ref": "../components/responses.json#/ServerError"
+        }
+      }
+    }
+  },
+  "item": {
+    "parameters": [
+      {
+        "$ref": "../components/parameters.json#/Organisation"
+      },
+      {
+        "$ref": "../components/parameters.json#/Workspace"
+      },
+      {
+        "$ref": "../components/parameters.json#/ProjectId"
+      }
+    ],
+    "get": {
+      "operationId": "getProject",
+      "tags": [
+        "Projects"
+      ],
+      "summary": "Get a project",
+      "description": "Permission: `projects.view`.",
+      "responses": {
+        "200": {
+          "description": "The project.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "$ref": "../components/schemas/Project.json"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "401": {
+          "$ref": "../components/responses.json#/Unauthenticated"
+        },
+        "403": {
+          "$ref": "../components/responses.json#/Forbidden"
+        },
+        "404": {
+          "$ref": "../components/responses.json#/NotFound"
+        },
+        "429": {
+          "$ref": "../components/responses.json#/RateLimited"
+        },
+        "500": {
+          "$ref": "../components/responses.json#/ServerError"
+        }
+      }
+    },
+    "patch": {
+      "operationId": "updateProject",
+      "tags": [
+        "Projects"
+      ],
+      "summary": "Update a project",
+      "description": "Permission: `projects.update`.",
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../components/schemas/ProjectUpdate.json"
+            }
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "The updated project.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "$ref": "../components/schemas/Project.json"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "401": {
+          "$ref": "../components/responses.json#/Unauthenticated"
+        },
+        "403": {
+          "$ref": "../components/responses.json#/Forbidden"
+        },
+        "404": {
+          "$ref": "../components/responses.json#/NotFound"
+        },
+        "422": {
+          "description": "validation_failed, or default_project_protected when disabling the default project.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../components/schemas/Error.json"
+              }
+            }
+          }
+        },
+        "429": {
+          "$ref": "../components/responses.json#/RateLimited"
+        },
+        "500": {
+          "$ref": "../components/responses.json#/ServerError"
+        }
+      }
+    },
+    "delete": {
+      "operationId": "deleteProject",
+      "tags": [
+        "Projects"
+      ],
+      "summary": "Delete a project",
+      "description": "Permission: `projects.delete`.",
+      "responses": {
+        "204": {
+          "$ref": "../components/responses.json#/NoContent"
+        },
+        "401": {
+          "$ref": "../components/responses.json#/Unauthenticated"
+        },
+        "403": {
+          "$ref": "../components/responses.json#/Forbidden"
+        },
+        "404": {
+          "$ref": "../components/responses.json#/NotFound"
+        },
+        "422": {
+          "description": "default_project_protected for the default project; project_not_empty while it still has API keys, routing rules, project-scoped DLP policies, moderation rules, prompt-shield rules or classifier rules, or budgets scoped to it.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../components/schemas/Error.json"
+              }
+            }
+          }
+        },
+        "429": {
+          "$ref": "../components/responses.json#/RateLimited"
+        },
+        "500": {
+          "$ref": "../components/responses.json#/ServerError"
+        }
+      }
+    }
+  }
+}

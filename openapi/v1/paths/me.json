@@ -1,0 +1,45 @@
+{
+  "me": {
+    "get": {
+      "operationId": "getMe",
+      "tags": [
+        "Me"
+      ],
+      "summary": "Describe the calling token",
+      "description": "Outside organisation context: how a caller discovers the organisation slug for every other route.",
+      "responses": {
+        "200": {
+          "description": "The token, its user and organisation.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "$ref": "../components/schemas/Me.json"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "401": {
+          "$ref": "../components/responses.json#/Unauthenticated"
+        },
+        "403": {
+          "$ref": "../components/responses.json#/Forbidden"
+        },
+        "429": {
+          "$ref": "../components/responses.json#/RateLimited"
+        },
+        "500": {
+          "$ref": "../components/responses.json#/ServerError"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Workspace",
+  "description": "A workspace: the default scope for routing rules and policies.",
+  "type": "object",
+  "required": [
+    "id",
+    "slug",
+    "name",
+    "description",
+    "default_project_id",
+    "is_default",
+    "created_at",
+    "updated_at"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^ws_[1-9][0-9]*$",
+      "description": "Public id of the workspace.",
+      "examples": [
+        "ws_12"
+      ]
+    },
+    "slug": {
+      "type": "string",
+      "description": "The {workspace} path segment (the `id` works there too). Create-only: on update it may be echoed back only with its current value — anything else is a 422 immutable_field. Changing it means replacing the resource.",
+      "x-create-only": true
+    },
+    "name": {
+      "type": "string"
+    },
+    "description": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "default_project_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^proj_[1-9][0-9]*$",
+      "description": "The project a new API key lands in when POST /api-keys names no project_id (the workspace’s default project). Null only for a workspace that has none."
+    },
+    "is_default": {
+      "type": "boolean"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO-8601, UTC."
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO-8601, UTC."
+    }
+  }
+}

@@ -1,0 +1,115 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "PromptShieldRule",
+  "description": "A prompt-shield rule: detects prompt-injection attempts in a workspace's requests. The stored shape the gateway enforces.",
+  "type": "object",
+  "required": [
+    "id",
+    "workspace_id",
+    "project_id",
+    "name",
+    "slug",
+    "category",
+    "detector",
+    "action",
+    "severity",
+    "enabled",
+    "created_at",
+    "updated_at"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^shield_[1-9][0-9]*$",
+      "description": "Public id of the rule.",
+      "examples": [
+        "shield_7"
+      ]
+    },
+    "workspace_id": {
+      "type": "string",
+      "pattern": "^ws_[1-9][0-9]*$",
+      "description": "Public id of the workspace.",
+      "examples": [
+        "ws_12"
+      ]
+    },
+    "project_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^proj_[1-9][0-9]*$",
+      "description": "Public id of the project the rule is scoped to; null = every project in the workspace.",
+      "examples": [
+        "proj_12"
+      ]
+    },
+    "name": {
+      "type": "string"
+    },
+    "slug": {
+      "type": "string"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "instruction_override",
+        "role_play",
+        "system_leak",
+        "indirect_injection",
+        "tool_abuse"
+      ],
+      "description": "New categories may be added; tolerate unknown values."
+    },
+    "detector": {
+      "type": "string",
+      "enum": [
+        "keyword",
+        "regex"
+      ]
+    },
+    "pattern": {
+      "type": "string",
+      "description": "RE2 regular expression. Present only when detector is `regex`."
+    },
+    "keywords": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Case-insensitive keywords. Present only when detector is `keyword`."
+    },
+    "action": {
+      "type": "string",
+      "enum": [
+        "log",
+        "warn",
+        "sanitize",
+        "block"
+      ]
+    },
+    "severity": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ]
+    },
+    "enabled": {
+      "type": "boolean"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO-8601, UTC."
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO-8601, UTC."
+    }
+  }
+}

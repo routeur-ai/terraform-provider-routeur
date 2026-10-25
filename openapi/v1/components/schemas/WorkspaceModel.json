@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "WorkspaceModel",
+  "description": "An upstream model in a workspace's catalogue and whether the workspace routes to it. Only `active` is configurable; the rest describes the model and may change as providers and the catalogue change.",
+  "type": "object",
+  "required": [
+    "id",
+    "provider",
+    "model_id",
+    "display_name",
+    "active",
+    "catalogued",
+    "availability",
+    "capabilities",
+    "context_tokens",
+    "input_per_1k",
+    "output_per_1k"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "The model slug, `<provider>:<model_id>`. This is the {model} path segment.",
+      "examples": [
+        "openai:gpt-4o"
+      ]
+    },
+    "provider": {
+      "type": "string",
+      "description": "Provider slug, e.g. openai.",
+      "examples": [
+        "openai"
+      ]
+    },
+    "model_id": {
+      "type": "string",
+      "description": "The upstream model id. May contain `/` or `:`."
+    },
+    "display_name": {
+      "type": "string",
+      "description": "Curated name; the model id when uncatalogued."
+    },
+    "active": {
+      "type": "boolean",
+      "description": "Whether the workspace routes to this model. Opt-in: false until set."
+    },
+    "catalogued": {
+      "type": "boolean",
+      "description": "False for a model discovered at the provider but not yet in routeur.ai's curated catalogue (prices and context may then be null)."
+    },
+    "availability": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "available",
+        "unavailable",
+        "deprecated",
+        null
+      ],
+      "description": "Last provider discovery result; null if never observed. Tolerate unknown values."
+    },
+    "capabilities": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "context_tokens": {
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "input_per_1k": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "Input price per 1,000 tokens, in USD."
+    },
+    "output_per_1k": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "Output price per 1,000 tokens, in USD."
+    }
+  }
+}

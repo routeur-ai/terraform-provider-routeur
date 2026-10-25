@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "PaginationMeta",
+  "description": "Cursor pagination state. Request the next page with `?cursor=<next_cursor>`; null means this is the last page.",
+  "type": "object",
+  "required": [
+    "path",
+    "per_page",
+    "next_cursor",
+    "prev_cursor"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "path": {
+      "type": "string",
+      "format": "uri"
+    },
+    "per_page": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 200
+    },
+    "next_cursor": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "prev_cursor": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  }
+}

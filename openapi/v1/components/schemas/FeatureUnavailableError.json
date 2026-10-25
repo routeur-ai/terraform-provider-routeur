@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "FeatureUnavailableError",
+  "description": "A 403 with code feature_unavailable: the organisation’s plan does not include the feature.",
+  "type": "object",
+  "required": [
+    "message",
+    "code",
+    "feature",
+    "required_plan"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "message": {
+      "type": "string"
+    },
+    "code": {
+      "const": "feature_unavailable"
+    },
+    "feature": {
+      "type": "string",
+      "description": "Feature key, e.g. budgets."
+    },
+    "required_plan": {
+      "type": "string",
+      "description": "Slug of the cheapest plan that includes it."
+    }
+  }
+}

@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "BudgetCreate",
+  "description": "Body of POST /budgets. Unknown keys are a 422. `scope_type` and `scope_id` may be changed later by PATCH; the currency is fixed.",
+  "type": "object",
+  "required": [
+    "name",
+    "scope_type",
+    "amount_cents"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 80
+    },
+    "scope_type": {
+      "type": "string",
+      "enum": [
+        "organisation",
+        "workspace",
+        "project",
+        "api_key"
+      ],
+      "description": "What the budget watches. `api_key` budgets alert but cannot be hard-blocked at the gateway."
+    },
+    "scope_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^(ws|proj|key)_[1-9][0-9]*$",
+      "description": "Public id of the workspace (`ws_…`), project (`proj_…`) or API key (`key_…`) in `scope_type`, in this organisation. Must be null for `organisation`."
+    },
+    "period": {
+      "type": "string",
+      "enum": [
+        "monthly",
+        "weekly"
+      ],
+      "description": "Calendar month (UTC) or Monday–Sunday week (UTC). Default `monthly`."
+    },
+    "amount_cents": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 100000000,
+      "description": "Cap in US cents (minor units), 1 to 100,000,000. Never a decimal."
+    },
+    "alert_threshold_pct": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 100,
+      "description": "Percentage of the cap at which the warning email is sent. Default 80."
+    },
+    "hard_block": {
+      "type": "boolean",
+      "description": "When true the gateway refuses requests once the cap is exceeded; otherwise alert only. Default false. Applied on the next budgets evaluation pass, not instantly. Sending true with scope_type `api_key` is a 422 validation_failed on hard_block (that scope can only alert)."
+    },
+    "enabled": {
+      "type": "boolean",
+      "description": "Absent = true on create, unchanged on update or replace. Boolean only: null is a 422."
+    },
+    "id": {
+      "readOnly": true,
+      "description": "Response field (read-only). Absent or null on create; on update it may be echoed back only with its current value — anything else is a 422 immutable_field."
+    },
+    "currency": {
+      "readOnly": true,
+      "description": "Response field (read-only). Absent or null on create; on update it may be echoed back only with its current value — anything else is a 422 immutable_field."
+    },
+    "created_at": {
+      "readOnly": true,
+      "description": "Response field (read-only). Absent or null on create; on update it may be echoed back only with its current value — anything else is a 422 immutable_field."
+    },
+    "updated_at": {
+      "readOnly": true,
+      "description": "Response field (read-only). Absent or null on create; on update it may be echoed back only with its current value — anything else is a 422 immutable_field."
+    }
+  }
+}

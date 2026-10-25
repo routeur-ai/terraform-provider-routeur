@@ -1,0 +1,17 @@
+name: Feature request
+description: A resource, argument or behaviour the provider does not have yet.
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What do you want to manage?
+      description: The routeur.ai setting or workflow, and why you want it in Terraform.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed configuration
+      description: How you would like it to look in Terraform, if you have an idea.
+      render: terraform

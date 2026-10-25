@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Me",
+  "description": "Who an API token acts as, in which organisation.",
+  "type": "object",
+  "required": [
+    "user",
+    "organisation",
+    "token"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "user": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "email",
+        "name"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^user_[1-9][0-9]*$",
+          "description": "Public id of the user.",
+          "examples": [
+            "user_12"
+          ]
+        },
+        "email": {
+          "type": "string",
+          "format": "email"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "organisation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "slug",
+        "name"
+      ],
+      "properties": {
+        "slug": {
+          "type": "string",
+          "description": "The {organisation} path segment for every other route."
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "token": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "fingerprint",
+        "expires_at"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "fingerprint": {
+          "type": "string",
+          "examples": [
+            "rtm_…abcd"
+          ]
+        },
+        "expires_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "description": "ISO-8601, UTC; null when not set."
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Project",
+  "description": "A project in a workspace; API keys belong to one.",
+  "type": "object",
+  "required": [
+    "id",
+    "workspace_id",
+    "name",
+    "slug",
+    "description",
+    "is_default",
+    "enabled",
+    "created_at",
+    "updated_at"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^proj_[1-9][0-9]*$",
+      "description": "Public id of the project.",
+      "examples": [
+        "proj_12"
+      ]
+    },
+    "workspace_id": {
+      "type": "string",
+      "pattern": "^ws_[1-9][0-9]*$",
+      "description": "Public id of the workspace.",
+      "examples": [
+        "ws_12"
+      ]
+    },
+    "name": {
+      "type": "string"
+    },
+    "slug": {
+      "type": "string",
+      "description": "Immutable after create.",
+      "x-create-only": true
+    },
+    "description": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "is_default": {
+      "type": "boolean",
+      "description": "The workspace’s default project cannot be disabled or deleted."
+    },
+    "enabled": {
+      "type": "boolean"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO-8601, UTC."
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO-8601, UTC."
+    }
+  }
+}

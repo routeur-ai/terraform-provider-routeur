@@ -1,0 +1,135 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DlpPolicy",
+  "description": "A DLP policy in the projected/gateway shape (schema/org-config.schema.json dlp_rule): exactly one of pattern, presets, keywords or secrets is present, chosen by detector. The same body PUT back to /dlp-policies/{policyId} is a no-op.",
+  "type": "object",
+  "required": [
+    "id",
+    "workspace_id",
+    "project_id",
+    "slug",
+    "name",
+    "detector",
+    "action",
+    "severity",
+    "enabled",
+    "created_at",
+    "updated_at"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^dlp_[1-9][0-9]*$",
+      "description": "Public id of the policy.",
+      "examples": [
+        "dlp_12"
+      ]
+    },
+    "workspace_id": {
+      "type": "string",
+      "pattern": "^ws_[1-9][0-9]*$",
+      "description": "Public id of the workspace.",
+      "examples": [
+        "ws_12"
+      ]
+    },
+    "project_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^proj_[1-9][0-9]*$",
+      "description": "Scope: a project in this workspace, or null for every project in the workspace (workspace and project policies compose: a request is matched by both)."
+    },
+    "slug": {
+      "type": "string",
+      "maxLength": 64,
+      "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$",
+      "description": "Unique in the workspace; the policy’s identifier in a trace’s dlp_matched_policies. Changing it renames that identifier."
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 80,
+      "description": "Unique in the workspace."
+    },
+    "detector": {
+      "type": "string",
+      "enum": [
+        "regex",
+        "preset",
+        "keyword",
+        "secret"
+      ],
+      "description": "Selects which one of pattern, presets, keywords or secrets carries the payload. Changing it means sending the new payload key."
+    },
+    "pattern": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2000,
+      "description": "RE2 regular expression (not PCRE: no lookarounds or backreferences). Only when detector is regex."
+    },
+    "presets": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 1,
+      "uniqueItems": true,
+      "description": "Managed preset ids (e.g. email, credit_card). Only when detector is preset."
+    },
+    "keywords": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "pattern": "^[^,]+$"
+      },
+      "minItems": 1,
+      "uniqueItems": true,
+      "description": "Case-insensitive substrings; no commas, no leading or trailing whitespace. Only when detector is keyword."
+    },
+    "secrets": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 1,
+      "uniqueItems": true,
+      "description": "Secret-scanner ids (e.g. adobe-client-id, 1password-secret-key). Only when detector is secret."
+    },
+    "action": {
+      "type": "string",
+      "enum": [
+        "log",
+        "warn",
+        "redact",
+        "tokenize",
+        "block"
+      ],
+      "description": "tokenize needs the plan that includes it; otherwise 422 on action."
+    },
+    "severity": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ]
+    },
+    "enabled": {
+      "type": "boolean"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

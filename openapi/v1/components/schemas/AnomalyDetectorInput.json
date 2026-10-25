@@ -1,0 +1,104 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AnomalyDetectorInput",
+  "description": "Body of POST /anomaly-detectors and PUT /anomaly-detectors/{detectorId} (a full replace). Unknown keys are a 422, at the top level and inside `threshold`. `type` is changeable on replace, but then `threshold` must carry the new type's key.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "name",
+    "type",
+    "threshold",
+    "window_minutes",
+    "action"
+  ],
+  "properties": {
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 80,
+      "description": "Unique in the workspace."
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "volume_spike",
+        "cost_spike",
+        "latency_spike",
+        "error_burst"
+      ]
+    },
+    "threshold": {
+      "type": "object",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "maxProperties": 1,
+      "description": "Exactly one key, chosen by `type`: volume_spike → baseline_pct (integer percent over baseline, 1–10000000); cost_spike → amount_cents (integer US cents, 1–1000000000); latency_spike → p95_ms (integer, 1–10000000); error_burst → error_rate_pct (number percent, 0.01–100).",
+      "properties": {
+        "baseline_pct": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10000000
+        },
+        "amount_cents": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000000000
+        },
+        "p95_ms": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10000000
+        },
+        "error_rate_pct": {
+          "type": "number",
+          "minimum": 0.01,
+          "maximum": 100
+        }
+      }
+    },
+    "window_minutes": {
+      "type": "integer",
+      "enum": [
+        5,
+        15,
+        30,
+        60,
+        180,
+        360,
+        720,
+        1440
+      ],
+      "description": "Evaluation window in minutes."
+    },
+    "action": {
+      "type": "string",
+      "enum": [
+        "alert",
+        "throttle",
+        "quarantine",
+        "block"
+      ],
+      "description": "`alert` records an event; `quarantine` and `block` also refuse matching requests while the event is open (429 anomaly_block_active); `throttle` is stored but not enforced."
+    },
+    "enabled": {
+      "type": "boolean",
+      "description": "Absent = true on create, unchanged on update or replace. Boolean only: null is a 422."
+    },
+    "id": {
+      "readOnly": true,
+      "description": "Response field (read-only). Absent or null on create; on update it may be echoed back only with its current value — anything else is a 422 immutable_field."
+    },
+    "workspace_id": {
+      "readOnly": true,
+      "description": "Response field (read-only). Absent or null on create; on update it may be echoed back only with its current value — anything else is a 422 immutable_field."
+    },
+    "created_at": {
+      "readOnly": true,
+      "description": "Response field (read-only). Absent or null on create; on update it may be echoed back only with its current value — anything else is a 422 immutable_field."
+    },
+    "updated_at": {
+      "readOnly": true,
+      "description": "Response field (read-only). Absent or null on create; on update it may be echoed back only with its current value — anything else is a 422 immutable_field."
+    }
+  }
+}

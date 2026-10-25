@@ -1,0 +1,290 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "RoutingRule",
+  "description": "A routing rule in the stored/gateway shape. The same body PUT back to /routing-rules/{ruleId} is a no-op. Lower priority is evaluated first; the Default route (is_default) sits at 1000 and is listed last.",
+  "type": "object",
+  "required": [
+    "id",
+    "workspace_id",
+    "project_id",
+    "slug",
+    "name",
+    "priority",
+    "enabled",
+    "is_default",
+    "action_kind",
+    "match",
+    "action",
+    "on_failure",
+    "created_at",
+    "updated_at"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^route_[1-9][0-9]*$",
+      "description": "Public id of the routing rule.",
+      "examples": [
+        "route_12"
+      ]
+    },
+    "workspace_id": {
+      "type": "string",
+      "pattern": "^ws_[1-9][0-9]*$",
+      "description": "Public id of the workspace.",
+      "examples": [
+        "ws_12"
+      ]
+    },
+    "project_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^proj_[1-9][0-9]*$",
+      "description": "null = applies to every project in the workspace."
+    },
+    "slug": {
+      "type": "string",
+      "description": "Server-assigned, immutable; the rule:<slug> reason in traces."
+    },
+    "name": {
+      "type": "string"
+    },
+    "priority": {
+      "type": "integer"
+    },
+    "enabled": {
+      "type": "boolean"
+    },
+    "is_default": {
+      "type": "boolean"
+    },
+    "action_kind": {
+      "type": "string",
+      "enum": [
+        "pin",
+        "auto",
+        "failover"
+      ]
+    },
+    "match": {
+      "$ref": "#/$defs/match"
+    },
+    "action": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/pin_action"
+        },
+        {
+          "$ref": "#/$defs/auto_action"
+        },
+        {
+          "$ref": "#/$defs/failover_action"
+        }
+      ],
+      "description": "Shape follows action_kind: pin {provider, model} · auto {quality_bias} · failover {strategy, targets}."
+    },
+    "on_failure": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/$defs/on_failure"
+        }
+      ]
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO-8601, UTC."
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO-8601, UTC."
+    }
+  },
+  "$defs": {
+    "match": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "{} matches every request. One condition group: its conditions at the top level (AND-ed). Several: `any_of` (OR of groups), nothing else at the top level.",
+      "properties": {
+        "requested_model": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80,
+          "description": "Stored verbatim: a blank value or one with leading or trailing whitespace is a 422."
+        },
+        "prompt_contains": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200,
+          "description": "Case-insensitive substring of the prompt. Stored verbatim: a blank value or one with leading or trailing whitespace is a 422."
+        },
+        "prompt_pattern": {
+          "type": "string",
+          "minLength": 1,
+          "description": "RE2 regular expression, stored verbatim — whitespace is part of the expression.",
+          "maxLength": 500
+        },
+        "min_input_tokens": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2000000,
+          "description": "Matches when the estimated input token count is at least this. A value below 1 is a 422, never dropped."
+        },
+        "contains_image": {
+          "const": true
+        },
+        "any_of": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 10,
+          "items": {
+            "$ref": "#/$defs/condition_group"
+          }
+        }
+      }
+    },
+    "condition_group": {
+      "type": "object",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "properties": {
+        "requested_model": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80,
+          "description": "Stored verbatim: a blank value or one with leading or trailing whitespace is a 422."
+        },
+        "prompt_contains": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200,
+          "description": "Case-insensitive substring of the prompt. Stored verbatim: a blank value or one with leading or trailing whitespace is a 422."
+        },
+        "prompt_pattern": {
+          "type": "string",
+          "minLength": 1,
+          "description": "RE2 regular expression, stored verbatim — whitespace is part of the expression.",
+          "maxLength": 500
+        },
+        "min_input_tokens": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2000000,
+          "description": "Matches when the estimated input token count is at least this. A value below 1 is a 422, never dropped."
+        },
+        "contains_image": {
+          "const": true
+        }
+      },
+      "description": "One OR-branch of any_of; its conditions are AND-ed. An empty group is a 422."
+    },
+    "pin_action": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "provider",
+        "model"
+      ],
+      "properties": {
+        "provider": {
+          "type": "string",
+          "description": "One of openai, anthropic, google, deepseek, mistral. An unknown provider is a 422 on this field."
+        },
+        "model": {
+          "type": "string"
+        }
+      }
+    },
+    "auto_action": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "quality_bias"
+      ],
+      "properties": {
+        "quality_bias": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "0 cheapest … 100 smartest; 50 is neutral."
+        }
+      }
+    },
+    "failover_action": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "strategy",
+        "targets"
+      ],
+      "properties": {
+        "strategy": {
+          "type": "string",
+          "enum": [
+            "sequential",
+            "race"
+          ]
+        },
+        "targets": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "provider",
+              "model"
+            ],
+            "properties": {
+              "provider": {
+                "type": "string",
+                "description": "One of openai, anthropic, google, deepseek, mistral. An unknown provider is a 422 on this field."
+              },
+              "model": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "on_failure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "retries",
+        "wait_seconds",
+        "then"
+      ],
+      "properties": {
+        "retries": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 5
+        },
+        "wait_seconds": {
+          "type": "integer",
+          "enum": [
+            0,
+            1,
+            5,
+            30
+          ]
+        },
+        "then": {
+          "type": "string",
+          "enum": [
+            "next",
+            "error"
+          ]
+        }
+      }
+    }
+  }
+}

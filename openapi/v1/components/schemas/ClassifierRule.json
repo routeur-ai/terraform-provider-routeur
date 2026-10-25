@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ClassifierRule",
+  "description": "A classifier score-threshold rule in the stored/gateway shape: it fires when the auto-router's score on `axis` is >= `min_score`. The same body PUT back to /classifier-rules/{classifierRuleId} is a no-op.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "workspace_id",
+    "project_id",
+    "name",
+    "slug",
+    "axis",
+    "min_score",
+    "action",
+    "enabled",
+    "created_at",
+    "updated_at"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^clf_[1-9][0-9]*$",
+      "description": "Public id of the classifier rule.",
+      "examples": [
+        "clf_12"
+      ]
+    },
+    "workspace_id": {
+      "type": "string",
+      "pattern": "^ws_[1-9][0-9]*$",
+      "description": "Public id of the workspace.",
+      "examples": [
+        "ws_12"
+      ]
+    },
+    "project_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "A proj_… id of a project in this workspace; null = every project in the workspace."
+    },
+    "name": {
+      "type": "string"
+    },
+    "slug": {
+      "type": "string",
+      "description": "Machine identifier, unique in the workspace."
+    },
+    "axis": {
+      "type": "string",
+      "enum": [
+        "toxicity",
+        "hate",
+        "violence",
+        "weapons",
+        "coding",
+        "long_reasoning",
+        "large_context",
+        "structured_output",
+        "creative"
+      ]
+    },
+    "min_score": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "action": {
+      "type": "string",
+      "enum": [
+        "log",
+        "flag",
+        "block"
+      ],
+      "description": "`block` rejects the prompt (HTTP 403); `flag` and `log` only report."
+    },
+    "enabled": {
+      "type": "boolean"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO-8601, UTC."
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO-8601, UTC."
+    }
+  }
+}

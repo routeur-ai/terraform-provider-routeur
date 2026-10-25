@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "PaginationLinks",
+  "description": "Ready-made URLs for the neighbouring pages (they keep `limit`). first/last are always null under cursor pagination.",
+  "type": "object",
+  "required": [
+    "first",
+    "last",
+    "prev",
+    "next"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "first": {
+      "type": "null"
+    },
+    "last": {
+      "type": "null"
+    },
+    "prev": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uri"
+    },
+    "next": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uri"
+    }
+  }
+}

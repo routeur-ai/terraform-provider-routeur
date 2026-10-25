@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ClassifierRuleInput",
+  "description": "Body of POST /classifier-rules and PUT /classifier-rules/{classifierRuleId} (a full replace: absent `project_id` means every project). Unknown keys are a 422. All fields are changeable on replace, `slug` included.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "name",
+    "slug",
+    "axis",
+    "min_score",
+    "action"
+  ],
+  "properties": {
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 80,
+      "description": "Unique in the workspace."
+    },
+    "slug": {
+      "type": "string",
+      "maxLength": 64,
+      "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$",
+      "description": "Unique in the workspace."
+    },
+    "axis": {
+      "type": "string",
+      "enum": [
+        "toxicity",
+        "hate",
+        "violence",
+        "weapons",
+        "coding",
+        "long_reasoning",
+        "large_context",
+        "structured_output",
+        "creative"
+      ]
+    },
+    "min_score": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "action": {
+      "type": "string",
+      "enum": [
+        "log",
+        "flag",
+        "block"
+      ]
+    },
+    "project_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "A proj_… id of a project in this workspace; null = every project in the workspace."
+    },
+    "enabled": {
+      "type": "boolean",
+      "description": "Absent = true on create, unchanged on update or replace. Boolean only: null is a 422."
+    },
+    "id": {
+      "readOnly": true,
+      "description": "Response field (read-only). Absent or null on create; on update it may be echoed back only with its current value — anything else is a 422 immutable_field."
+    },
+    "workspace_id": {
+      "readOnly": true,
+      "description": "Response field (read-only). Absent or null on create; on update it may be echoed back only with its current value — anything else is a 422 immutable_field."
+    },
+    "created_at": {
+      "readOnly": true,
+      "description": "Response field (read-only). Absent or null on create; on update it may be echoed back only with its current value — anything else is a 422 immutable_field."
+    },
+    "updated_at": {
+      "readOnly": true,
+      "description": "Response field (read-only). Absent or null on create; on update it may be echoed back only with its current value — anything else is a 422 immutable_field."
+    }
+  }
+}

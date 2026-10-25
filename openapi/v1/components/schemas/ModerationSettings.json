@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ModerationSettings",
+  "description": "Organisation-wide output-moderation settings (a singleton).",
+  "type": "object",
+  "required": [
+    "streaming_moderation"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "streaming_moderation": {
+      "type": "string",
+      "enum": [
+        "buffered",
+        "chunked"
+      ],
+      "description": "How output moderation applies to streamed responses, organisation-wide: `buffered` scans the whole response before sending a byte (never leaks blocked content); `chunked` scans as tokens stream (lower latency, may disclose content before a block). A rule's own `streaming` overrides it. Unset reads as `buffered`."
+    }
+  }
+}

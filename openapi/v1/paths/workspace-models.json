@@ -1,0 +1,209 @@
+{
+  "collection": {
+    "parameters": [
+      {
+        "$ref": "../components/parameters.json#/Organisation"
+      },
+      {
+        "$ref": "../components/parameters.json#/Workspace"
+      }
+    ],
+    "get": {
+      "operationId": "listWorkspaceModels",
+      "tags": [
+        "Workspace models"
+      ],
+      "summary": "List a workspace's models",
+      "description": "Permission: `models.viewer`. The catalogue for the providers the organisation has an enabled credential for: curated models plus models seen by discovery. `active` is this workspace's choice. A model of a provider with no enabled credential is not listed even when it is active (activated earlier, or its credential was disabled or deleted since): it stays active and readable with GET /models/{model}.",
+      "parameters": [
+        {
+          "$ref": "../components/parameters.json#/Limit"
+        },
+        {
+          "$ref": "../components/parameters.json#/Cursor"
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "A page of models, ordered by id.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "data",
+                  "links",
+                  "meta"
+                ],
+                "properties": {
+                  "data": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "../components/schemas/WorkspaceModel.json"
+                    }
+                  },
+                  "links": {
+                    "$ref": "../components/schemas/PaginationLinks.json"
+                  },
+                  "meta": {
+                    "$ref": "../components/schemas/PaginationMeta.json"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "401": {
+          "$ref": "../components/responses.json#/Unauthenticated"
+        },
+        "403": {
+          "$ref": "../components/responses.json#/Forbidden"
+        },
+        "404": {
+          "$ref": "../components/responses.json#/NotFound"
+        },
+        "422": {
+          "description": "validation_failed — limit or cursor out of range.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../components/schemas/Error.json"
+              }
+            }
+          }
+        },
+        "429": {
+          "$ref": "../components/responses.json#/RateLimited"
+        },
+        "500": {
+          "$ref": "../components/responses.json#/ServerError"
+        }
+      }
+    }
+  },
+  "item": {
+    "parameters": [
+      {
+        "$ref": "../components/parameters.json#/Organisation"
+      },
+      {
+        "$ref": "../components/parameters.json#/Workspace"
+      },
+      {
+        "$ref": "../components/parameters.json#/ModelSlug"
+      }
+    ],
+    "get": {
+      "operationId": "getWorkspaceModel",
+      "tags": [
+        "Workspace models"
+      ],
+      "summary": "Get a model",
+      "description": "Permission: `models.viewer`. Any model routeur.ai knows (curated or discovered), including one whose provider has no enabled credential; unknown is 404.",
+      "responses": {
+        "200": {
+          "description": "The model.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "$ref": "../components/schemas/WorkspaceModel.json"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "401": {
+          "$ref": "../components/responses.json#/Unauthenticated"
+        },
+        "403": {
+          "$ref": "../components/responses.json#/Forbidden"
+        },
+        "404": {
+          "$ref": "../components/responses.json#/NotFound"
+        },
+        "429": {
+          "$ref": "../components/responses.json#/RateLimited"
+        },
+        "500": {
+          "$ref": "../components/responses.json#/ServerError"
+        }
+      }
+    },
+    "put": {
+      "operationId": "setWorkspaceModelActive",
+      "tags": [
+        "Workspace models"
+      ],
+      "summary": "Activate or deactivate a model",
+      "description": "Permission: `models.admin`. Sets `active` to the given value (idempotent). Works for any model GET /models/{model} returns, including one whose provider has no enabled credential: it is activated, but listWorkspaceModels does not list it until the organisation has an enabled credential for that provider. Setting the current state, or `false` on a model never activated, changes nothing and writes no audit entry. Models cannot be created or deleted here; deactivating is the way to remove one from routing. Deactivating a model a routing rule pins or lists as a failover target (enabled or not) is refused with 409 `model_in_use`, naming the rules; point them at another model first.",
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../components/schemas/WorkspaceModelUpdate.json"
+            }
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "The model.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "$ref": "../components/schemas/WorkspaceModel.json"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "401": {
+          "$ref": "../components/responses.json#/Unauthenticated"
+        },
+        "403": {
+          "$ref": "../components/responses.json#/Forbidden"
+        },
+        "404": {
+          "$ref": "../components/responses.json#/NotFound"
+        },
+        "409": {
+          "description": "model_in_use — a routing rule in this workspace uses the model; the message names each rule as `slug (route_…)`.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../components/schemas/Error.json"
+              }
+            }
+          }
+        },
+        "422": {
+          "$ref": "../components/responses.json#/ValidationFailed"
+        },
+        "429": {
+          "$ref": "../components/responses.json#/RateLimited"
+        },
+        "500": {
+          "$ref": "../components/responses.json#/ServerError"
+        }
+      }
+    }
+  }
+}

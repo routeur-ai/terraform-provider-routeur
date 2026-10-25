@@ -1,0 +1,139 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "RoutingRuleInput",
+  "description": "Body of POST /routing-rules and PUT /routing-rules/{ruleId} (on PUT, project_id, action_kind, match, action and on_failure are replaced: an absent project_id means every project, an absent match means every request, an absent on_failure clears the failure policy; name, priority and enabled are kept when absent or null). Unknown keys are a 422, at the top level and inside match, action and on_failure.",
+  "type": "object",
+  "required": [
+    "action_kind"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "project_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "A proj_… id in this workspace; null or absent = every project. The project must be enabled when newly targeted; re-sending the rule's current project is accepted even if it was disabled since. Replaced on PUT."
+    },
+    "name": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "minLength": 1,
+      "description": "Unique in the workspace. On create, null or absent = generated from the rule. On PUT, null or absent = unchanged."
+    },
+    "priority": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 1,
+      "maximum": 999,
+      "description": "On create, null or absent = placed after the existing rules. On PUT, null or absent = unchanged."
+    },
+    "enabled": {
+      "type": "boolean",
+      "description": "Absent = true on create, unchanged on update or replace. Boolean only: null is a 422."
+    },
+    "action_kind": {
+      "type": "string",
+      "enum": [
+        "pin",
+        "auto",
+        "failover"
+      ]
+    },
+    "match": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "RoutingRule.json#/$defs/match"
+        }
+      ]
+    },
+    "action": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "RoutingRule.json#/$defs/pin_action"
+        },
+        {
+          "$ref": "RoutingRule.json#/$defs/auto_action"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "strategy": {
+              "type": "string",
+              "enum": [
+                "sequential",
+                "race"
+              ]
+            },
+            "targets": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "provider",
+                  "model"
+                ],
+                "properties": {
+                  "provider": {
+                    "type": "string",
+                    "description": "One of openai, anthropic, google, deepseek, mistral. An unknown provider is a 422 on this field."
+                  },
+                  "model": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "description": "auto: quality_bias defaults to 50. failover: strategy defaults to sequential."
+    },
+    "on_failure": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "RoutingRule.json#/$defs/on_failure"
+        }
+      ]
+    },
+    "id": {
+      "readOnly": true,
+      "description": "Response field (read-only). Absent or null on create; on update it may be echoed back only with its current value — anything else is a 422 immutable_field."
+    },
+    "workspace_id": {
+      "readOnly": true,
+      "description": "Response field (read-only). Absent or null on create; on update it may be echoed back only with its current value — anything else is a 422 immutable_field."
+    },
+    "slug": {
+      "readOnly": true,
+      "description": "Response field (read-only). Absent or null on create; on update it may be echoed back only with its current value — anything else is a 422 immutable_field."
+    },
+    "is_default": {
+      "readOnly": true,
+      "description": "Response field (read-only). Absent or null on create; on update it may be echoed back only with its current value — anything else is a 422 immutable_field."
+    },
+    "created_at": {
+      "readOnly": true,
+      "description": "Response field (read-only). Absent or null on create; on update it may be echoed back only with its current value — anything else is a 422 immutable_field."
+    },
+    "updated_at": {
+      "readOnly": true,
+      "description": "Response field (read-only). Absent or null on create; on update it may be echoed back only with its current value — anything else is a 422 immutable_field."
+    }
+  }
+}

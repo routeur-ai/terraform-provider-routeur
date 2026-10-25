@@ -1,0 +1,339 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "routeur.ai management API",
+    "version": "1.0.0",
+    "summary": "Configuration as code for routeur.ai: workspaces, projects, API keys and routing rules.",
+    "description": "Configuration only — AI traffic goes to api.routeur.ai. Authenticate with an API token (`rtm_…`) minted in Settings → API tokens; it acts as the user who minted it, in their organisation, with their permissions.\n\n**Errors** share one envelope (`Error`): branch on `code` (a valid token whose owner lacks MFA in an organisation that requires it gets 403 `mfa_required`; any `{organisation}` slug other than the token’s, existing or not, gets 403 `org_mismatch` — a 404 always means the workspace or resource itself is missing).\n\n**Lists** are cursor-paginated: `?limit=` (1–200, default 100) and `?cursor=` from `meta.next_cursor`.\n\n**Request bodies** are strict: an unknown top-level key is a 422. PATCH: absent = unchanged, `null` clears a nullable field.\n\n**Strings are stored verbatim** — never trimmed, and `\"\"` never becomes null. Names, labels, keys and list items must not start or end with whitespace (422). A blank string (`\"\"` or whitespace only) is a 422 everywhere except free-text descriptions, where `\"\"` is stored and returned as `\"\"`. Regex patterns keep any whitespace you send.\n\n**Immutable fields.** Read-only response fields (`id`, `workspace_id`, timestamps, `state`, …) and create-only fields (marked `x-create-only: true`: workspace and project `slug`, credential `provider`) may be echoed back on update only with their current value — compared with what GET returns, timestamps as the same string. A different value is a 422 `immutable_field`; on create, read-only fields must be absent or null. Changing a create-only field means replacing the resource.\n\n**Slugs** are lowercase letters, digits and hyphens (workspaces, projects) or lowercase letters, digits and underscores (policies and rules). **`{workspace}`** in a path takes the slug or the `ws_…` id.\n\n**`enabled`** is boolean only (`null` is a 422): absent = true on create, unchanged on update or replace.\n\n**Plan features** gate create and update only; list, read and delete keep working after a downgrade, so `terraform plan` and `destroy` still succeed.\n\n**Rate limits**: per token 600 reads (GET) and 120 writes per minute; 1200 requests per minute per IP. Over the limit: 429 `rate_limited` with `Retry-After`.\n\n**Propagation**: writes reach the gateway asynchronously, usually within seconds. A 2xx means the change is stored, not that it is live; expect seconds, at worst minutes. Rotating an API key mints a new key with a new `id`.\n\n**Versioning**: within v1 changes are additive only — new endpoints, optional request fields, response fields, enum values and error codes. Clients must ignore unknown response fields and tolerate unknown enum values and codes. Breaking changes ship as /api/v2 with an overlap period. Deprecated fields and endpoints keep working, are marked `deprecated: true` here, and respond with `Deprecation` (RFC 9745) and `Sunset` (RFC 8594) headers."
+  },
+  "servers": [
+    {
+      "url": "https://app.routeur.ai/api/v1"
+    }
+  ],
+  "security": [
+    {
+      "managementToken": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "Me"
+    },
+    {
+      "name": "Workspaces"
+    },
+    {
+      "name": "Workspace models"
+    },
+    {
+      "name": "Projects"
+    },
+    {
+      "name": "API keys"
+    },
+    {
+      "name": "Routing rules"
+    },
+    {
+      "name": "Classifier rules"
+    },
+    {
+      "name": "Anomaly detectors"
+    },
+    {
+      "name": "Provider credentials"
+    },
+    {
+      "name": "Budgets"
+    },
+    {
+      "name": "DLP policies"
+    },
+    {
+      "name": "Output moderation"
+    },
+    {
+      "name": "Prompt shields"
+    }
+  ],
+  "paths": {
+    "/orgs/{organisation}/provider-credentials": {
+      "$ref": "paths/provider-credentials.json#/collection"
+    },
+    "/orgs/{organisation}/provider-credentials/{credentialId}": {
+      "$ref": "paths/provider-credentials.json#/item"
+    },
+    "/orgs/{organisation}/budgets": {
+      "$ref": "paths/budgets.json#/collection"
+    },
+    "/orgs/{organisation}/budgets/{budgetId}": {
+      "$ref": "paths/budgets.json#/item"
+    },
+    "/me": {
+      "$ref": "paths/me.json#/me"
+    },
+    "/orgs/{organisation}/workspaces": {
+      "$ref": "paths/workspaces.json#/collection"
+    },
+    "/orgs/{organisation}/workspaces/{workspace}": {
+      "$ref": "paths/workspaces.json#/item"
+    },
+    "/orgs/{organisation}/workspaces/{workspace}/models": {
+      "$ref": "paths/workspace-models.json#/collection"
+    },
+    "/orgs/{organisation}/workspaces/{workspace}/models/{model}": {
+      "$ref": "paths/workspace-models.json#/item"
+    },
+    "/orgs/{organisation}/workspaces/{workspace}/projects": {
+      "$ref": "paths/projects.json#/collection"
+    },
+    "/orgs/{organisation}/workspaces/{workspace}/projects/{projectId}": {
+      "$ref": "paths/projects.json#/item"
+    },
+    "/orgs/{organisation}/workspaces/{workspace}/api-keys": {
+      "$ref": "paths/api-keys.json#/collection"
+    },
+    "/orgs/{organisation}/workspaces/{workspace}/api-keys/{keyId}": {
+      "$ref": "paths/api-keys.json#/item"
+    },
+    "/orgs/{organisation}/workspaces/{workspace}/api-keys/{keyId}/rotate": {
+      "$ref": "paths/api-keys.json#/rotate"
+    },
+    "/orgs/{organisation}/workspaces/{workspace}/api-keys/{keyId}/revoke": {
+      "$ref": "paths/api-keys.json#/revoke"
+    },
+    "/orgs/{organisation}/workspaces/{workspace}/routing-rules": {
+      "$ref": "paths/routing-rules.json#/collection"
+    },
+    "/orgs/{organisation}/workspaces/{workspace}/routing-rules/{ruleId}": {
+      "$ref": "paths/routing-rules.json#/item"
+    },
+    "/orgs/{organisation}/workspaces/{workspace}/default-route": {
+      "$ref": "paths/routing-rules.json#/default"
+    },
+    "/orgs/{organisation}/workspaces/{workspace}/classifier-rules": {
+      "$ref": "paths/classifier-rules.json#/collection"
+    },
+    "/orgs/{organisation}/workspaces/{workspace}/classifier-rules/{classifierRuleId}": {
+      "$ref": "paths/classifier-rules.json#/item"
+    },
+    "/orgs/{organisation}/workspaces/{workspace}/anomaly-detectors": {
+      "$ref": "paths/anomaly-detectors.json#/collection"
+    },
+    "/orgs/{organisation}/workspaces/{workspace}/anomaly-detectors/{detectorId}": {
+      "$ref": "paths/anomaly-detectors.json#/item"
+    },
+    "/orgs/{organisation}/workspaces/{workspace}/dlp-policies": {
+      "$ref": "paths/dlp-policies.json#/collection"
+    },
+    "/orgs/{organisation}/workspaces/{workspace}/dlp-policies/{policyId}": {
+      "$ref": "paths/dlp-policies.json#/item"
+    },
+    "/orgs/{organisation}/moderation-settings": {
+      "$ref": "paths/moderation-rules.json#/settings"
+    },
+    "/orgs/{organisation}/workspaces/{workspace}/moderation-rules": {
+      "$ref": "paths/moderation-rules.json#/collection"
+    },
+    "/orgs/{organisation}/workspaces/{workspace}/moderation-rules/{ruleId}": {
+      "$ref": "paths/moderation-rules.json#/item"
+    },
+    "/orgs/{organisation}/workspaces/{workspace}/prompt-shield-rules": {
+      "$ref": "paths/prompt-shield-rules.json#/collection"
+    },
+    "/orgs/{organisation}/workspaces/{workspace}/prompt-shield-rules/{ruleId}": {
+      "$ref": "paths/prompt-shield-rules.json#/item"
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "managementToken": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "rtm_…",
+        "description": "Authorization: Bearer rtm_… — an API token."
+      }
+    },
+    "schemas": {
+      "ProviderCredential": {
+        "$ref": "components/schemas/ProviderCredential.json"
+      },
+      "ProviderCredentialCreate": {
+        "$ref": "components/schemas/ProviderCredentialCreate.json"
+      },
+      "ProviderCredentialUpdate": {
+        "$ref": "components/schemas/ProviderCredentialUpdate.json"
+      },
+      "Budget": {
+        "$ref": "components/schemas/Budget.json"
+      },
+      "BudgetCreate": {
+        "$ref": "components/schemas/BudgetCreate.json"
+      },
+      "BudgetUpdate": {
+        "$ref": "components/schemas/BudgetUpdate.json"
+      },
+      "Error": {
+        "$ref": "components/schemas/Error.json"
+      },
+      "FeatureUnavailableError": {
+        "$ref": "components/schemas/FeatureUnavailableError.json"
+      },
+      "PaginationLinks": {
+        "$ref": "components/schemas/PaginationLinks.json"
+      },
+      "PaginationMeta": {
+        "$ref": "components/schemas/PaginationMeta.json"
+      },
+      "Me": {
+        "$ref": "components/schemas/Me.json"
+      },
+      "Workspace": {
+        "$ref": "components/schemas/Workspace.json"
+      },
+      "WorkspaceCreate": {
+        "$ref": "components/schemas/WorkspaceCreate.json"
+      },
+      "WorkspaceUpdate": {
+        "$ref": "components/schemas/WorkspaceUpdate.json"
+      },
+      "WorkspaceModel": {
+        "$ref": "components/schemas/WorkspaceModel.json"
+      },
+      "WorkspaceModelUpdate": {
+        "$ref": "components/schemas/WorkspaceModelUpdate.json"
+      },
+      "Project": {
+        "$ref": "components/schemas/Project.json"
+      },
+      "ProjectCreate": {
+        "$ref": "components/schemas/ProjectCreate.json"
+      },
+      "ProjectUpdate": {
+        "$ref": "components/schemas/ProjectUpdate.json"
+      },
+      "ApiKey": {
+        "$ref": "components/schemas/ApiKey.json"
+      },
+      "ApiKeyWithSecret": {
+        "$ref": "components/schemas/ApiKeyWithSecret.json"
+      },
+      "ApiKeyCreate": {
+        "$ref": "components/schemas/ApiKeyCreate.json"
+      },
+      "ApiKeyUpdate": {
+        "$ref": "components/schemas/ApiKeyUpdate.json"
+      },
+      "RoutingRule": {
+        "$ref": "components/schemas/RoutingRule.json"
+      },
+      "RoutingRuleInput": {
+        "$ref": "components/schemas/RoutingRuleInput.json"
+      },
+      "DefaultRouteInput": {
+        "$ref": "components/schemas/DefaultRouteInput.json"
+      },
+      "ClassifierRule": {
+        "$ref": "components/schemas/ClassifierRule.json"
+      },
+      "ClassifierRuleInput": {
+        "$ref": "components/schemas/ClassifierRuleInput.json"
+      },
+      "AnomalyDetector": {
+        "$ref": "components/schemas/AnomalyDetector.json"
+      },
+      "AnomalyDetectorInput": {
+        "$ref": "components/schemas/AnomalyDetectorInput.json"
+      },
+      "DlpPolicy": {
+        "$ref": "components/schemas/DlpPolicy.json"
+      },
+      "DlpPolicyInput": {
+        "$ref": "components/schemas/DlpPolicyInput.json"
+      },
+      "ModerationRule": {
+        "$ref": "components/schemas/ModerationRule.json"
+      },
+      "ModerationRuleInput": {
+        "$ref": "components/schemas/ModerationRuleInput.json"
+      },
+      "ModerationSettings": {
+        "$ref": "components/schemas/ModerationSettings.json"
+      },
+      "ModerationSettingsInput": {
+        "$ref": "components/schemas/ModerationSettingsInput.json"
+      },
+      "PromptShieldRule": {
+        "$ref": "components/schemas/PromptShieldRule.json"
+      },
+      "PromptShieldRuleInput": {
+        "$ref": "components/schemas/PromptShieldRuleInput.json"
+      }
+    },
+    "responses": {
+      "Unauthenticated": {
+        "$ref": "components/responses.json#/Unauthenticated"
+      },
+      "Forbidden": {
+        "$ref": "components/responses.json#/Forbidden"
+      },
+      "NotFound": {
+        "$ref": "components/responses.json#/NotFound"
+      },
+      "ValidationFailed": {
+        "$ref": "components/responses.json#/ValidationFailed"
+      },
+      "RateLimited": {
+        "$ref": "components/responses.json#/RateLimited"
+      },
+      "ServerError": {
+        "$ref": "components/responses.json#/ServerError"
+      },
+      "NoContent": {
+        "$ref": "components/responses.json#/NoContent"
+      }
+    },
+    "parameters": {
+      "CredentialId": {
+        "$ref": "components/parameters.json#/CredentialId"
+      },
+      "BudgetId": {
+        "$ref": "components/parameters.json#/BudgetId"
+      },
+      "Organisation": {
+        "$ref": "components/parameters.json#/Organisation"
+      },
+      "Workspace": {
+        "$ref": "components/parameters.json#/Workspace"
+      },
+      "ProjectId": {
+        "$ref": "components/parameters.json#/ProjectId"
+      },
+      "ModelSlug": {
+        "$ref": "components/parameters.json#/ModelSlug"
+      },
+      "KeyId": {
+        "$ref": "components/parameters.json#/KeyId"
+      },
+      "RuleId": {
+        "$ref": "components/parameters.json#/RuleId"
+      },
+      "Limit": {
+        "$ref": "components/parameters.json#/Limit"
+      },
+      "Cursor": {
+        "$ref": "components/parameters.json#/Cursor"
+      },
+      "PolicyId": {
+        "$ref": "components/parameters.json#/PolicyId"
+      },
+      "ModerationRuleId": {
+        "$ref": "components/parameters.json#/ModerationRuleId"
+      },
+      "ShieldRuleId": {
+        "$ref": "components/parameters.json#/ShieldRuleId"
+      }
+    }
+  }
+}

@@ -1,0 +1,121 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ModerationRule",
+  "description": "An output-moderation rule: scans model responses in a workspace. The stored shape the gateway enforces.",
+  "type": "object",
+  "required": [
+    "id",
+    "workspace_id",
+    "project_id",
+    "name",
+    "slug",
+    "category",
+    "pattern",
+    "action",
+    "severity",
+    "streaming",
+    "enabled",
+    "created_at",
+    "updated_at"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^mod_[1-9][0-9]*$",
+      "description": "Public id of the rule.",
+      "examples": [
+        "mod_7"
+      ]
+    },
+    "workspace_id": {
+      "type": "string",
+      "pattern": "^ws_[1-9][0-9]*$",
+      "description": "Public id of the workspace.",
+      "examples": [
+        "ws_12"
+      ]
+    },
+    "project_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^proj_[1-9][0-9]*$",
+      "description": "Public id of the project the rule is scoped to; null = every project in the workspace.",
+      "examples": [
+        "proj_12"
+      ]
+    },
+    "name": {
+      "type": "string"
+    },
+    "slug": {
+      "type": "string"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "hate",
+        "harassment",
+        "profanity",
+        "sexual",
+        "sexual_minors",
+        "self_harm",
+        "violence",
+        "weapons",
+        "regex"
+      ],
+      "description": "A managed category, or `regex` for a custom pattern. New categories may be added; tolerate unknown values."
+    },
+    "pattern": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "RE2 regex; non-null only when category is `regex`."
+    },
+    "action": {
+      "type": "string",
+      "enum": [
+        "log",
+        "redact",
+        "block",
+        "rewrite"
+      ]
+    },
+    "severity": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ]
+    },
+    "streaming": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "buffered",
+        "chunked",
+        null
+      ],
+      "description": "Per-rule override of the organisation streaming default (GET /moderation-settings); null inherits it."
+    },
+    "enabled": {
+      "type": "boolean"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO-8601, UTC."
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO-8601, UTC."
+    }
+  }
+}
